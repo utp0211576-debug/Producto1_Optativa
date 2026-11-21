@@ -1,0 +1,15 @@
+# Carpetas de compilación y caché de Visual Studio / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+
+# Archivos de configuración con credenciales de base de datos (Neon PostgreSQL)
+appsettings.json
+appsettings.Development.json
+
+# Carpetas de editores
+.vscode/
+.idea/

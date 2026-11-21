@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Inventario</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="toastContainer"></div>
+
+    <!-- MODAL INICIO DE SESIÓN -->
+    <div id="loginOverlay">
+        <div class="login-modal">
+            <span class="brand-badge" style="margin-bottom: 12px; display: inline-block;">Sistema de Inventario</span>
+            <h2 style="font-size: 1.5em; margin-bottom: 6px;">Bienvenido de nuevo</h2>
+            <p style="color: var(--text-muted); font-size: 0.85em; margin-bottom: 24px;">Ingresa tus credenciales para acceder</p>
+
+            <form id="formLogin">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <input type="text" id="loginUsuario" placeholder="Ej: admin, vendedor, almacen" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-custom" style="margin-top: 10px;">Acceder al Panel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NAVBAR DOCK -->
+    <header class="navbar" id="topNavbar" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="brand-badge">INVENTARIO</span>
+            <h2 id="appTitle" style="font-size: 1.1em;">Gestión de Inventario</h2>
+        </div>
+        <div style="display: flex; align-items: center; gap: 18px;">
+            <span id="userInfo" style="font-size: 0.85em; color: var(--text-muted);"></span>
+            <button class="btn-custom btn-danger" onclick="cerrarSesion()">Salir</button>
+        </div>
+    </header>
+
+    <!-- DASHBOARD PRINCIPAL -->
+    <main class="main-layout" id="mainLayout" style="display: none;">
+
+        <!-- MONITOR DE STOCK BAJO -->
+        <section class="alert-banner">
+            <h4 style="color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+                ⚠️ Monitor de Alertas de Stock
+            </h4>
+            <ul id="listaStockBajo">
+                <li>Analizando existencias...</li>
+            </ul>
+        </section>
+
+        <div class="dashboard-grid">
+
+            <!-- PANEL DE OPERACIONES -->
+            <aside style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- CREAR CATEGORÍA (ADMIN Y ALMACENISTA) -->
+                <div class="card-panel rol-sec admin-only almacen-only">
+                    <div class="card-title" style="color: #a855f7;">🏷️ Registrar Categoría</div>
+                    <form id="formCategoria">
+                        <div class="form-group">
+                            <label>Nombre de Categoría *</label>
+                            <input type="text" id="catNombre" placeholder="Ej: Electrónica, Bebidas..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <input type="text" id="catDesc" placeholder="Breve descripción">
+                        </div>
+                        <button type="submit" class="btn-custom" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">Añadir Categoría</button>
+                    </form>
+                </div>
+
+                <!-- CREAR PRODUCTO (ADMIN Y ALMACENISTA) -->
+                <div class="card-panel rol-sec admin-only almacen-only">
+                    <div class="card-title">✨ Registrar Producto</div>
+                    <form id="formProducto">
+                        <div class="form-group">
+                            <label>Código de Barras</label>
+                            <input type="text" id="prodCodigo" placeholder="EAN / UPC">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre *</label>
+                            <input type="text" id="prodNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <input type="text" id="prodDesc">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="prodCat"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Proveedor</label>
+                                <select id="prodProv"></select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-group">
+                                <label>P. Compra</label>
+                                <input type="number" id="prodCompra" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>P. Venta</label>
+                                <input type="number" id="prodVenta" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Mínimo</label>
+                            <input type="number" id="prodMinimo" value="5" required>
+                        </div>
+                        <button type="submit" class="btn-custom">Guardar en Catálogo</button>
+                    </form>
+                </div>
+
+                <!-- ENTRADAS / RECEPCIÓN DE MERCANCÍA (ADMIN Y ALMACENISTA) -->
+                <div class="card-panel rol-sec admin-only almacen-only">
+                    <div class="card-title" style="color: #34d399;">📥 Registrar Entrada (Recepción)</div>
+                    <form id="formEntrada">
+                        <div class="form-group">
+                            <label>Producto Target</label>
+                            <select id="entProducto" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad Ingresada</label>
+                            <input type="number" id="entCantidad" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Notas / Proveedor</label>
+                            <input type="text" id="entMotivo" placeholder="Ej: Recepción de mercancía">
+                        </div>
+                        <button type="submit" class="btn-custom btn-green">Añadir Stock</button>
+                    </form>
+                </div>
+
+                <!-- SALIDAS / VENTAS (ADMIN Y VENDEDOR) -->
+                <div class="card-panel rol-sec admin-only vendedor-only">
+                    <div class="card-title" style="color: #fb923c;">📤 Registrar Salida (Venta)</div>
+                    <form id="formSalida">
+                        <div class="form-group">
+                            <label>Producto Target</label>
+                            <select id="salProducto" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad Retirada</label>
+                            <input type="number" id="salCantidad" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Notas / Destino</label>
+                            <input type="text" id="salMotivo" placeholder="Ej: Venta de mostrador">
+                        </div>
+                        <button type="submit" class="btn-custom btn-orange">Descontar Stock</button>
+                    </form>
+                </div>
+
+            </aside>
+
+            <!-- VISTA DE TABLA MATRIZ -->
+            <section class="card-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="card-title" style="border: none; margin: 0; padding: 0;">📊 Catálogo de Productos</div>
+                    <button class="btn-custom" style="width: auto; padding: 8px 16px; font-size: 0.8em;" onclick="cargarProductos()">Actualizar</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Precio Venta</th>
+                                <th class="acciones-col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaProductos">
+                            <!-- Datos inyectados por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="JS/app.js"></script>
+</body>
+</html>
